@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Deck List Generator</title>
+
+
+    
+    <!-- scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="styles/semantic/semantic.min.css">
+    <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+    <script src="styles/semantic/semantic.min.js"></script>
+
+
+    <!-- modulos -->
+    <link rel="stylesheet" href="styles/semantic/components/dropdown.min.css">
+    <script src="styles/semantic/components/dropdown.min.js"></script>
+
+
+    <link rel="stylesheet" href="styles/style.css">
+
+</head>
+<body>
+
+  <div id="app">
+    <header>
+        <span class="tittle">Deck List Generator - UwU</span>
+    </header>
+
+    <div class="container">
+        <div class="ui grid">
+          <div class="row">
+            <div class="three wide column" >
+             <div class="ui cards" id="left-panel">
+                <div class="card">
+                  <div class="content">
+                   <form class="ui form">
+                    <div class="field">
+                      <label>Nombre del Deck</label>
+                      <input type="text" name="first-name" value="Full Anti Meta" disabled="true">
+                    </div>
+                    <div class="field">
+                      <label>ID User</label>
+                      <input type="text" name="last-name" value="2332" disabled="true">
+                    </div>
+                    <div class="field">
+                      <label>ID Evento</label>
+                      <input type="text" name="last-name" value="8989" disabled="true">
+                    </div>
+
+                    <button class="ui green button" type="submit">Submit</button>
+                  </form>
+                  </div>
+                </div> 
+              </div>
+
+              <div class="ui cards" id="left-panel">
+                <div class="card">
+                  <div class="content">
+                    <img class="right floated mini ui image" src="img/elliot.jpg">
+                    <div class="header">
+                      Generador de Deck List
+                    </div>
+                    <div class="meta">
+                      * Utiliza los filtras para encontrar más fácil tu carta deseada.
+                    </div>
+                    <div class="description">
+                      A través de la aplicacion puedes registrar tu decks_list para usarlo en los eventos 
+                      de las ligas Pokemon!! ... ahora , a crear el mejor mazo.
+                    </div>
+                  </div>
+                </div> 
+              </div>
+            </div>
+
+            <div class="four wide column" >
+              <div class="ui grid">
+                <div class="twelve wide column" >
+                  <div :class="searchPoke" id="#searchPokemon">
+                    <input type="hidden" name="country" id='other' >
+                    <i class="dropdown icon"></i>
+                    <input class="search" v-on:keyup="searchPokemon()" id="searchPokemon" autocomplete="off" >
+                    <div class="default text">Search...</div>
+                    <div class="menu">
+                      <div class="item cardsItems" v-for="pokemon in pokemons" v-on:click="selectpokemonDD(pokemon)">
+                        <img class="ui image" :src="pokemon.imgSet">
+                          {{pokemon.name}}
+                        <span>{{pokemon.number}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="four wide column">
+                  <button class="ui button teal" v-on:click="addPokemon()">
+                    <i class="plus square icon"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="ui center aligned basic segment" style="position: relative;z-index: -1">
+                <div class="ui horizontal divider">
+                  Pokemons <i class="eye grey icon"></i>
+                </div>
+              </div>
+              <div class="row">
+                <table class="ui striped table">
+                  <thead>
+                    <tr>
+                      <th>Cantidad</th>
+                      <th>Nombre de la Carta</th>
+                      <th>N°</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="item_card_select" v-for="(pokemon, index) in pokemonSelecteds">
+                      <td>
+                        <i class="minus circle icon red" v-on:click="minusPokemon(index)"></i>
+                          {{pokemon.cant}}
+                        <i class="plus circle icon yellow" v-on:click="plusPokemon(index)"></i>
+                      </td>
+                      <td >
+                        {{pokemon.name}}
+                        <img class="ui avatar image" :src="pokemon.imgSet">
+                      </td>
+                      <td>
+                        {{pokemon.number}}
+                      </td>
+                             
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+            <!-- Trainers -->
+
+            <div class="four wide column" >
+              <div class="ui grid">
+                <div class="twelve wide column" >
+                  <div :class="searchClassTrainer" id="#searchClassTrainer">
+                    <input type="hidden" name="country" id='other' >
+                    <i class="dropdown icon"></i>
+                    <input class="search" v-on:keyup="searchTrainer()" id="searchTrainer" autocomplete="off" >
+                    <div class="default text">Search...</div>
+                    <div class="menu">
+                      <div class="item cardsItems" v-for="trainer in trainers" v-on:click="selectTrainerDD(trainer)">
+                          {{trainer.name}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="four wide column">
+                  <button class="ui button teal" v-on:click="addTrainer()">
+                    <i class="plus square icon"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="ui center aligned basic segment" style="position: relative;z-index: -1">
+                <div class="ui horizontal divider">
+                  Trainers <i class="eye yellow icon"></i>
+                </div>
+              </div>
+              <div class="row">
+                <table class="ui striped table">
+                  <thead>
+                    <tr>
+                      <th>Cantidad</th>
+                      <th>Nombre de la Carta</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="item_card_select" v-for="trainer in trainersSelecteds">
+                      <td>
+                        <i class="minus circle icon red"></i>
+                          {{trainer.cant}}
+                        <i class="plus circle icon yellow"></i>
+                      </td>
+                      <td >
+                        {{trainer.name}}
+                        <img class="ui avatar image" :src="trainer.imgSet">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ./Trainers -->
+
+
+            <!-- Energy -->
+
+            <div class="four wide column" >
+              <div class="ui grid">
+                  <div class="twelve wide column" >
+                    <div :class="searchClassEnergy" id="#searchPokemon">
+                      <input type="hidden" name="country" id='other' >
+                      <i class="dropdown icon"></i>
+                      <input class="search" v-on:keyup="searchEnergy()" id="searchEnergy" autocomplete="off" >
+                      <div class="default text">Search...</div>
+                      <div class="menu">
+                        <div class="item cardsItems" v-for="energy in energies" v-on:click="selectEnergyDD(energy)">
+                            {{energy.name}}
+                          <span>{{energy.number}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="four wide column">
+                    <button class="ui button teal" v-on:click="addEnergy()">
+                      <i class="plus square icon"></i>
+                    </button>
+                  </div>
+              </div>
+              <div class="ui center aligned basic segment" style="position: relative;z-index: -1">
+                  <div class="ui horizontal divider">
+                    Energy <i class="eye pink icon"></i>
+                  </div>
+              </div>
+              <div class="row">
+                <table class="ui striped table">
+                  <thead>
+                    <tr>
+                      <th>Cantidad</th>
+                      <th>Nombre de la Carta</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="item_card_select" v-for="energy in energiesSelecteds">
+                      <td>
+                        <i class="minus circle icon red"></i>
+                          {{energy.cant}}
+                        <i class="plus circle icon yellow"></i>
+                      </td>
+                      <td >
+                        {{energy.name}}
+                      </td>        
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ./Energy -->
+
+          </div>
+        </div>
+    </div>
+
+    <div class="ui center aligned basic segment">
+      <div class="ui horizontal divider">
+        Deck List <i class="eye icon"></i>
+      </div>
+    </div>
+
+     <div class="ui grid" style="padding-left: 15px;">
+          <div class="row">
+            
+
+
+          </div>
+    
+      </div>
+  </div>
+
+</body>
+
+ <script src="scripts/action.js"></script>
+
+</html>
