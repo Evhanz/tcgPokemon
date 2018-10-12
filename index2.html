@@ -45,7 +45,7 @@
                    <form class="ui form">
                     <div class="field">
                       <label>Nombre del Deck</label>
-                      <input type="text" name="first-name" value="Full Anti Meta" disabled="true">
+                      <input type="text" name="nameDeck" value="Full Anti Meta" id="nameDeck">
                     </div>
                     <div class="field">
                       <label>ID User</label>
@@ -53,10 +53,10 @@
                     </div>
                     <div class="field">
                       <label>ID Evento</label>
-                      <input type="text" name="last-name" value="8989" disabled="true">
+                      <input type="text" name="last-name" value="8989" disabled="true" id="participante">
                     </div>
 
-                    <button class="ui green button" type="submit">Submit</button>
+                    <button class="ui green button" type="submit" v-on:click="guardar()">Submit</button>
                   </form>
                   </div>
                 </div> 
@@ -82,7 +82,7 @@
             </div>
 
             <div class="four wide column" >
-              <div class="ui grid">
+              <div class="ui grid" style="align-items: baseline;">
                 <div class="twelve wide column" >
                   <div :class="searchPoke" id="#searchPokemon">
                     <input type="hidden" name="country" id='other' >
@@ -98,11 +98,9 @@
                     </div>
                   </div>
                 </div>
-                <div class="four wide column">
-                  <button class="ui button teal" v-on:click="addPokemon()">
+                  <button class="ui button teal btnSearch" v-on:click="addPokemon()">
                     <i class="plus square icon"></i>
                   </button>
-                </div>
               </div>
               <div class="ui center aligned basic segment" style="position: relative;z-index: -1">
                 <div class="ui horizontal divider">
@@ -143,7 +141,7 @@
             <!-- Trainers -->
 
             <div class="four wide column" >
-              <div class="ui grid">
+              <div class="ui grid" style="align-items: baseline;">
                 <div class="twelve wide column" >
                   <div :class="searchClassTrainer" id="#searchClassTrainer">
                     <input type="hidden" name="country" id='other' >
@@ -157,11 +155,10 @@
                     </div>
                   </div>
                 </div>
-                <div class="four wide column">
-                  <button class="ui button teal" v-on:click="addTrainer()">
-                    <i class="plus square icon"></i>
-                  </button>
-                </div>
+                <button class="ui button teal btnSearch" v-on:click="addTrainer()">
+                  <i class="plus square icon"></i>
+                </button>
+               
               </div>
               <div class="ui center aligned basic segment" style="position: relative;z-index: -1">
                 <div class="ui horizontal divider">
@@ -177,11 +174,11 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="item_card_select" v-for="trainer in trainersSelecteds">
+                    <tr class="item_card_select" v-for="(trainer,index) in trainersSelecteds">
                       <td>
-                        <i class="minus circle icon red"></i>
+                        <i class="minus circle icon red" v-on:click="minusTrainer(index)"></i>
                           {{trainer.cant}}
-                        <i class="plus circle icon yellow"></i>
+                        <i class="plus circle icon yellow" v-on:click="plusTrainer(index)"></i>
                       </td>
                       <td >
                         {{trainer.name}}
@@ -199,7 +196,7 @@
             <!-- Energy -->
 
             <div class="four wide column" >
-              <div class="ui grid">
+              <div class="ui grid" style="align-items: baseline;">
                   <div class="twelve wide column" >
                     <div :class="searchClassEnergy" id="#searchPokemon">
                       <input type="hidden" name="country" id='other' >
@@ -214,11 +211,9 @@
                       </div>
                     </div>
                   </div>
-                  <div class="four wide column">
-                    <button class="ui button teal" v-on:click="addEnergy()">
+                   <button class="ui button teal btnSearch" v-on:click="addEnergy()">
                       <i class="plus square icon"></i>
                     </button>
-                  </div>
               </div>
               <div class="ui center aligned basic segment" style="position: relative;z-index: -1">
                   <div class="ui horizontal divider">
@@ -234,11 +229,11 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="item_card_select" v-for="energy in energiesSelecteds">
+                    <tr class="item_card_select" v-for="(energy, index) in energiesSelecteds">
                       <td>
-                        <i class="minus circle icon red"></i>
+                        <i class="minus circle icon red" v-on:click="minusEnergy(index)"></i>
                           {{energy.cant}}
-                        <i class="plus circle icon yellow"></i>
+                        <i class="plus circle icon yellow" v-on:click="plusEnergy(index)"></i>
                       </td>
                       <td >
                         {{energy.name}}

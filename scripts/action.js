@@ -1,10 +1,7 @@
 var vue = new Vue({
     el: '#app',
     data: {
-        sets: [{
-          name:'-----------',
-          code:''
-        }],
+        sets: [],
         searchs:[],
         energies:[],
         energiesSelecteds:[],
@@ -18,7 +15,9 @@ var vue = new Vue({
         searchClassEnergy: 'ui fluid search selection dropdown',
         pokeSelect:{},
         trainerSelect:{},
-        energySelect:{}
+        energySelect:{},
+        setsFull:'',
+        urlSave:''
       },
       methods: {
         addCardPokemon: function (item) {
@@ -39,19 +38,31 @@ var vue = new Vue({
           var type = 'Pokémon';
           var temp_values= []
           this.searchPoke = 'ui loading fluid search selection dropdown';
+          var url = '';
+          var baseApi = this.baseApi;
 
-          if(searchValue.trim().length > 0){
+          if(searchValue.trim().length > 3){
 
-            $.post( "controller.php", { name: searchValue, type:type}, function( data ) {
-               vue.pokemons = [];
+            /**make URL**/
+            url = baseApi+'cards?supertype=pokemon&name='+searchValue.trim()+'&setCode='+vue.setsFull;
 
-              data.forEach(function(itemVal){
-                  vue.pokemons.push(itemVal);
+            $.getJSON( url)
+              .done(function( data ) {
+                $.each( data.cards, function( i, item ) {
+
+                  $.each( vue.sets, function( j, set ) {
+                    if(item.setCode == set.code){
+                      item.imgSet=set.symbolUrl;
+                    }
+                  });
+                  
+                  vue.pokemons.push(item);                 
+                });
+
+                vue.searchPoke = 'ui fluid search selection dropdown';
               });
 
-              vue.searchPoke = 'ui fluid search selection dropdown';
 
-            }, "json");
           }
         },
         selectpokemonDD: function(pokemon){
@@ -92,21 +103,40 @@ var vue = new Vue({
           var vue = this;
           var searchValue = $('#searchTrainer').val();
           var type = 'Trainer';
-          var temp_values= []
+          var temp_values= [];
+          var baseApi = this.baseApi;
           this.searchClassTrainer = 'ui loading fluid search selection dropdown';
 
-          if(searchValue.trim().length > 0){
+          if(searchValue.trim().length > 3){
 
-            $.post( "controller.php", { name: searchValue, type:type}, function( data ) {
-               vue.trainers = [];
 
-              data.forEach(function(itemVal){
-                  vue.trainers.push(itemVal);
+            url = baseApi+'cards?supertype=trainer&name='+searchValue.trim()+'&setCode='+vue.setsFull;
+
+            $.getJSON( url)
+              .done(function( data ) {
+
+                var temp_values = [];
+
+                $.each( data.cards, function( i, item ) {
+
+                  $.each( vue.sets, function( j, set ) {
+                    if(item.setCode == set.code){
+                      item.imgSet=set.symbolUrl;
+                    }
+                  });
+
+                  if(temp_values.indexOf(item.name) == -1){
+                    vue.trainers.push(item);
+                    temp_values.push(item.name);
+
+                  }
+                  
+                                   
+                });
+
+                vue.searchClassTrainer = 'ui fluid search selection dropdown';
               });
 
-              vue.searchClassTrainer = 'ui fluid search selection dropdown';
-
-            }, "json");
           }
         },
         selectTrainerDD: function(trainer){
@@ -146,21 +176,32 @@ var vue = new Vue({
           var vue = this;
           var searchValue = $('#searchEnergy').val();
           var type = 'Energy';
-          var temp_values= []
+          var temp_values= [];
+          var baseApi = this.baseApi;
           this.searchClassEnergy = 'ui loading fluid search selection dropdown';
 
-          if(searchValue.trim().length > 0){
+          if(searchValue.trim().length > 3){
 
-            $.post( "controller.php", { name: searchValue, type:type}, function( data ) {
-               vue.energies = [];
+            url = baseApi+'cards?supertype=energy&name='+searchValue.trim()+'&setCode='+vue.setsFull;
 
-              data.forEach(function(itemVal){
-                  vue.energies.push(itemVal);
+            $.getJSON( url)
+              .done(function( data ) {
+
+                var temp_values = [];
+
+                $.each( data.cards, function( i, item ) {
+
+                  if(temp_values.indexOf(item.name) == -1){
+                    vue.energies.push(item);
+                    temp_values.push(item.name);
+                  }
+                  
+                                   
+                });
+
+                vue.searchClassEnergy = 'ui fluid search selection dropdown';
               });
 
-              vue.searchClassEnergy = 'ui fluid search selection dropdown';
-
-            }, "json");
           }
         },
         selectEnergyDD: function(energy){
@@ -249,15 +290,120 @@ var vue = new Vue({
 
           this.pokemonSelecteds = [];
           this.pokemonSelecteds =  temp_valued;
+        },
+        plusTrainer: function(index){
+
+          var temp_valued = this.trainersSelecteds;
+
+          if(this.validateCardName(this.trainersSelecteds[index].name)){
+             temp_valued[index].cant ++;
+          }
+
+          this.trainersSelecteds = [];
+          this.trainersSelecteds =  temp_valued;
+
+        },
+        minusTrainer: function(index){
+          var temp_valued = this.trainersSelecteds;
+
+          temp_valued[index].cant --;
+
+          if(temp_valued[index].cant == 0){
+            temp_valued.splice(index, 1);
+          }
+
+          this.trainersSelecteds = [];
+          this.trainersSelecteds =  temp_valued;
+        },
+        plusEnergy: function(index){
+
+          var temp_valued = this.energiesSelecteds;
+
+          if(temp_valued[index].subtype == 'Special'){
+            if(temp_valued[index].cant<4)
+              temp_valued[index].cant++;
+          } else {
+            temp_valued[index].cant++;
+          }
+
+        
+          this.energiesSelecteds = [];
+          this.energiesSelecteds =  temp_valued;
+
+        },
+        minusEnergy: function(index){
+          var temp_valued = this.energiesSelecteds;
+
+          temp_valued[index].cant --;
+
+          if(temp_valued[index].cant == 0){
+            temp_valued.splice(index, 1);
+          }
+
+          this.energiesSelecteds = [];
+          this.energiesSelecteds = temp_valued;
+        },
+        guardar: function(){
+
+
+          var urlSave = this.urlSave;
+          var vue = this;
+
+          var cant_cards = 0;
+
+
+          vue.pokemonSelecteds.forEach(function(item){
+
+            cant_cards+=item.cant;
+          });
+
+          vue.trainersSelecteds.forEach(function(item){
+            cant_cards+=item.cant;
+          });
+
+          vue.energiesSelecteds.forEach(function(item){
+            cant_cards+=item.cant;
+          });
+
+        
+       
+          console.log( cant_cards);
+
+          if(cant_cards != 60){
+
+            alert('El deck no tiene 60 cartas!! ... corrige tu mazo :3');
+
+          } else {
+            $.post( urlSave, 
+              { 
+                nameDeck: $("#nameDeck").val(), 
+                pokemons: vue.pokemonSelecteds, 
+                trainers: vue.trainersSelecteds, 
+                energies: vue.energiesSelecteds,
+                idParticipante:$("#participante").val() 
+              })
+            .done(function() {
+              alert( "Guardado Correctamente");
+            });
+          }
+
+          
+
         }
       },
       created: function () {
         var sets_found = this.sets;
+        var vue = this;
 
         $.getJSON( "https://api.pokemontcg.io/v1/sets?standardLegal=true", function( data ) {
           data.sets.forEach(function(item){
             sets_found.push(item);
+            vue.setsFull +=item.code+'|';
           });
+
+          vue.setsFull = vue.setsFull.slice(0,-1);
+
+
         });
       //  alert('hola');
 
